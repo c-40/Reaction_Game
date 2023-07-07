@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reaction Time Game</title>
+    <style type="text/css">
+        body {
+            background-color: #1f1f1f;
+            text-align: center;
+            padding-top: 50px;
+            font-family: Arial, sans-serif;
+        }
+        
+        h1 {
+            color: #fff;
+            margin-bottom: 20px;
+        }
+        
+        #shape {
+            width: 200px;
+            height: 200px;
+            background-color: red;
+            display: none;
+            position: absolute;
+            cursor: pointer;
+            transition: background-color 0.3s, opacity 0.5s;
+        }
+        
+        .box {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 600px;
+        }
+        
+        p {
+            margin-bottom: 10px;
+            color: #fff;
+        }
+        
+        #shape:hover {
+            background-color: #ff5454;
+        }
+        
+        #result {
+            margin-top: 20px;
+            color: #fff;
+        }
+        
+        #result-item {
+            margin-bottom: 5px;
+        }
+        
+        #button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .game-button {
+            margin: 0 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #2ecc71;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        .game-button:hover {
+            background-color: #27ae60;
+        }
+        
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Your Reaction Time!</h1>
+    <p>Click on the shape as fast as you can.</p>
+    <p>Your time: <span id="time"><br>
+        <div id="button-container">
+            <button class="game-button" onclick="startGame()">Start</button>
+            <button class="game-button" onclick="stopGame()">Stop</button>
+        </div>
+        <div id="result"></div></span></p>
+    <div class="box">
+        <div id="shape" onclick="speed()"></div>
+    </div>
+    
+    <script>
+        let start = 0;
+        var myArray = [];
+        var intervalId;
+        
+        function getRandomColor() {
+            var letters = '0123456789ABCDEF';
+            var color = '#';
+            
+            for (var i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            
+            return color;
+        }
+        
+        function appear() {
+            let boxWidth = document.querySelector('.box').offsetWidth;
+            let boxHeight = document.querySelector('.box').offsetHeight;
+            let shapeWidth = 200;
+            let shapeHeight = 200;
+            let top = Math.random() * (boxHeight - shapeHeight);
+            let left = Math.random() * (boxWidth - shapeWidth);
+            let width = Math.random() * 200 + 100;
+            
+            if (Math.random() > 0.5) {
+                document.getElementById("shape").style.borderRadius = "50%";
+            } else {
+                document.getElementById("shape").style.borderRadius = "0";
+            }
+            
+            document.getElementById("shape").style.background = getRandomColor();    
+            document.getElementById("shape").style.width = width + "px";    
+            document.getElementById("shape").style.height = width + "px";    
+            document.getElementById("shape").style.left = left + "px";    
+            document.getElementById("shape").style.top = top + "px";    
+            document.getElementById("shape").style.display = "block";
+            start = new Date().getTime();
+        }
+        
+        function delay() {
+            intervalId = setTimeout(appear, Math.random() * 2000);
+        }
+        
+        function speed() {
+            clearTimeout(intervalId);
+            document.getElementById("shape").style.display = "none";
+            let end = new Date().getTime();
+            let time = (end - start) / 1000;
+            document.getElementById("time").innerHTML = time.toFixed(2) + "s";
+            myArray.push(time);
+            delay();
+        }
+        
+        function startGame() {
+            clearInterval(intervalId);
+            document.getElementById("time").innerHTML = "";
+            myArray = [];
+            delay();
+        }
+        
+        function stopGame() {
+            clearTimeout(intervalId);
+            showResults();
+        }
+        
+        function showResults() {
+            let resultDiv = document.getElementById("result");
+            resultDiv.innerHTML = "<h3>Reaction Times:</h3>";
+            
+            myArray.forEach(function(time, index) {
+                let resultItem = document.createElement("p");
+                resultItem.id = "result-item";
+                resultItem.textContent = "Attempt " + (index + 1) + ": " + time.toFixed(2) + "s";
+                resultDiv.appendChild(resultItem);
+            });
+        }
+        
+        // Bounce animation for buttons
+        const buttons = document.querySelectorAll('.game-button');
+        
+        buttons.forEach(button => {
+            button.addEventListener('click', function() {
+                button.style.animation = 'bounce 0.5s ease';
+                setTimeout(() => {
+                    button.style.animation = '';
+                }, 500);
+            });
+        });
+    </script>
+</body>
+</html>
